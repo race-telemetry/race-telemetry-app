@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, TextareaHTMLAttributes } from 'react'
 
 import { initials } from '../lib/format'
@@ -185,6 +186,52 @@ export function Alert({ tone = 'bad', children }: { tone?: Tone; children: React
   }
   return (
     <div className={`rounded-xl border px-3.5 py-2.5 text-sm ${styles[tone]}`}>{children}</div>
+  )
+}
+
+/**
+ * Tombol "Salin" untuk teks yang harus dipindahkan ke aplikasi lain (mis. alamat
+ * server & token device untuk PC Bridge). Menampilkan konfirmasi singkat.
+ */
+export function CopyButton({
+  value,
+  label = 'Salin',
+  className = '',
+}: {
+  value: string
+  label?: string
+  className?: string
+}) {
+  const [tersalin, setTersalin] = useState(false)
+
+  async function salin() {
+    try {
+      await navigator.clipboard.writeText(value)
+    } catch {
+      // Clipboard API bisa diblokir (bukan HTTPS / izin ditolak).
+      const area = document.createElement('textarea')
+      area.value = value
+      area.style.position = 'fixed'
+      area.style.opacity = '0'
+      document.body.appendChild(area)
+      area.select()
+      document.execCommand('copy')
+      document.body.removeChild(area)
+    }
+    setTersalin(true)
+    setTimeout(() => setTersalin(false), 1800)
+  }
+
+  return (
+    <Button
+      type="button"
+      variant={tersalin ? 'primary' : 'secondary'}
+      onClick={salin}
+      className={`shrink-0 ${className}`}
+      aria-live="polite"
+    >
+      {tersalin ? 'Tersalin ✓' : label}
+    </Button>
   )
 }
 

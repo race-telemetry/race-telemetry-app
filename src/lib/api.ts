@@ -4,7 +4,7 @@
  * Semua permintaan lewat origin yang sama (Vite mem-proxy `/api`), jadi tidak
  * perlu CORS. `VITE_API_BASE` hanya diisi bila API ada di domain lain.
  */
-import type { FeedItem, Me, Paginated, PublicUser, RaceSummary } from '../types'
+import type { Device, DeviceSetup, FeedItem, Me, Paginated, PublicUser, RaceSummary } from '../types'
 
 const BASE = (import.meta.env.VITE_API_BASE ?? '').replace(/\/+$/, '')
 
@@ -122,4 +122,24 @@ export const api = {
     const query = params.toString()
     return request<Paginated<RaceSummary>>(`/api/races${query ? `?${query}` : ''}`, { token })
   },
+
+  // --- PC Bridge: alamat server & token device --------------------------
+  /** Alamat server (WSS) yang harus diisi di PC Bridge + awalan token. */
+  deviceSetup: (token: string, signal?: AbortSignal) =>
+    request<DeviceSetup>('/api/device-setup', { token, signal }),
+
+  /** Daftar PC yang sudah didaftarkan dengan akun ini. */
+  devices: (token: string, signal?: AbortSignal) =>
+    request<{ data: Device[] }>('/api/devices', { token, signal }),
+
+  /** Daftarkan PC baru; token hanya dikembalikan SEKALI ini. */
+  createDevice: (token: string, name: string) =>
+    request<{ device: { id: string; name: string; createdAt: string }; token: string }>(
+      '/api/devices',
+      { method: 'POST', body: { name }, token },
+    ),
+
+  /** Cabut PC (token-nya langsung tidak bisa dipakai lagi). */
+  revokeDevice: (token: string, id: string) =>
+    request<null>(`/api/devices/${encodeURIComponent(id)}`, { method: 'DELETE', token }),
 }

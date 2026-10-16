@@ -68,3 +68,25 @@ export type Paginated<T> = {
   data: T[]
   pagination: Pagination
 }
+
+/** Satu PC (device) yang terdaftar memakai token kita. */
+export type Device = {
+  id: string
+  name: string
+  lastSeenAt: string | null
+  revokedAt: string | null
+  createdAt: string
+  active: boolean
+}
+
+/**
+ * Info untuk mengisi PC Bridge (dari `/api/device-setup`).
+ * `source: 'env'` = alamat resmi dari konfigurasi server;
+ * `'derived'` = disimpulkan dari alamat website (perlu dipastikan user).
+ */
+export type DeviceSetup = {
+  wsUrl: string
+  apiBase: string
+  tokenPrefix: string
+  source: 'env' | 'derived'
+}
