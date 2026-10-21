@@ -1,57 +1,62 @@
-import { useCallback, useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
-import { SessionCard } from '../components/SessionCard'
-import { Button, Card, EmptyState, Spinner } from '../components/ui'
-import { ApiError, api } from '../lib/api'
-import { useAuth } from '../state/auth'
-import type { FeedItem } from '../types'
+import { SessionCard } from "../components/SessionCard";
+import { Button, Card, EmptyState, Spinner } from "../components/ui";
+import { ApiError, api } from "../lib/api";
+import { useAuth } from "../state/auth";
+import type { FeedItem } from "../types";
 
 const FITUR = [
   {
-    judul: 'Timeline publik',
-    isi: 'Semua sesi balapan yang sudah selesai dari seluruh pembalap, dalam satu aliran.',
+    judul: "Timeline publik",
+    isi: "Semua sesi balapan yang sudah selesai dari seluruh pembalap, dalam satu aliran.",
   },
   {
-    judul: 'Profil pembalap',
-    isi: 'Halaman profil dengan statistik: sesi, lap, lap terbaik, dan kecepatan tertinggi.',
+    judul: "Profil pembalap",
+    isi: "Halaman profil dengan statistik: sesi, lap, lap terbaik, dan kecepatan tertinggi.",
   },
   {
-    judul: 'Langganan otomatis',
-    isi: 'PC Bridge mengirim telemetri; hasil balapan langsung masuk ke timeline Anda.',
+    judul: "Langganan otomatis",
+    isi: "PC Bridge mengirim telemetri; hasil balapan langsung masuk ke timeline Anda.",
   },
-]
+];
 
 export default function Landing() {
-  const { user, ready } = useAuth()
-  const [terbaru, setTerbaru] = useState<FeedItem[]>([])
-  const [memuat, setMemuat] = useState(true)
-  const [galat, setGalat] = useState<string | null>(null)
+  const { user, ready } = useAuth();
+  const [terbaru, setTerbaru] = useState<FeedItem[]>([]);
+  const [memuat, setMemuat] = useState(true);
+  const [galat, setGalat] = useState<string | null>(null);
 
   const muat = useCallback((signal: AbortSignal) => {
-    setMemuat(true)
-    setGalat(null)
+    setMemuat(true);
+    setGalat(null);
     api
       .feed({ limit: 4, signal })
       .then((res) => setTerbaru(res.data))
       .catch((err: unknown) => {
-        if (err instanceof DOMException && err.name === 'AbortError') return
-        setGalat(err instanceof ApiError ? err.message : 'Gagal memuat aktivitas.')
+        if (err instanceof DOMException && err.name === "AbortError") return;
+        setGalat(
+          err instanceof ApiError ? err.message : "Gagal memuat aktivitas.",
+        );
       })
-      .finally(() => setMemuat(false))
-  }, [])
+      .finally(() => setMemuat(false));
+  }, []);
 
   useEffect(() => {
-    const controller = new AbortController()
-    muat(controller.signal)
-    return () => controller.abort()
-  }, [muat])
+    const controller = new AbortController();
+    muat(controller.signal);
+    return () => controller.abort();
+  }, [muat]);
 
   return (
     <div className="space-y-14">
       {/* ---------- hero ---------- */}
       <section className="relative overflow-hidden rounded-3xl border border-[#2A3746] bg-[#141B24]">
-        <div className="grid-fade pointer-events-none absolute inset-0 opacity-70" aria-hidden="true" />
+        <div
+          className="grid-fade pointer-events-none absolute inset-0 opacity-70"
+          aria-hidden="true"
+        />
         <div className="relative px-6 py-14 sm:px-10 sm:py-16">
           <span className="inline-flex items-center gap-2 rounded-full border border-[#19E3B1]/40 bg-[#19E3B1]/10 px-3 py-1 text-[10px] font-semibold tracking-[0.16em] text-[#19E3B1] uppercase">
             Telemetry &amp; Race Tracking
@@ -61,8 +66,9 @@ export default function Landing() {
             Race Telemetry <span className="text-[#19E3B1]">App</span>
           </h1>
           <p className="mt-4 max-w-xl text-sm leading-relaxed text-[#93A3B5] sm:text-base">
-            Kumpulan hasil balapan dari simulator racing — telemetri dari PC Bridge, hasil
-            lap yang sudah divalidasi server, dan profil tiap pembalap.
+            Kumpulan hasil balapan dari simulator racing — telemetri dari PC
+            Bridge, hasil lap yang sudah divalidasi server, dan profil tiap
+            pembalap.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -92,8 +98,12 @@ export default function Landing() {
         <div className="mt-4 grid gap-4 sm:grid-cols-3">
           {FITUR.map((item) => (
             <Card key={item.judul} className="p-5">
-              <h3 className="text-sm font-semibold text-[#E9F0F7]">{item.judul}</h3>
-              <p className="mt-2 text-xs leading-relaxed text-[#93A3B5]">{item.isi}</p>
+              <h3 className="text-sm font-semibold text-[#E9F0F7]">
+                {item.judul}
+              </h3>
+              <p className="mt-2 text-xs leading-relaxed text-[#93A3B5]">
+                {item.isi}
+              </p>
             </Card>
           ))}
         </div>
@@ -130,8 +140,8 @@ export default function Landing() {
                 variant="secondary"
                 className="mt-3"
                 onClick={() => {
-                  const controller = new AbortController()
-                  muat(controller.signal)
+                  const controller = new AbortController();
+                  muat(controller.signal);
                 }}
               >
                 Coba lagi
@@ -151,7 +161,7 @@ export default function Landing() {
       </section>
 
       {/* ---------- cara kerja ---------- */}
-      <section>
+      {/* <section>
         <h2 className="text-[11px] font-semibold tracking-[0.14em] text-[#93A3B5] uppercase">
           Cara kerjanya
         </h2>
@@ -168,7 +178,7 @@ export default function Landing() {
             </li>
           ))}
         </ol>
-      </section>
+      </section> */}
     </div>
-  )
+  );
 }
