@@ -37,8 +37,19 @@ export default function Login() {
   }
 
   return (
-    <div className="mx-auto max-w-md">
-      <h1 className="text-2xl font-bold text-[#E9F0F7]">Masuk</h1>
+    <>
+      {/* Latar halaman login: foto dari img_assets + lapisan gelap & blur. */}
+      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        <img
+          src="/img_assets/homescreen.jpg"
+          alt=""
+          className="h-full w-full object-contain opacity-45 blur-[3px]"
+        />
+        <div className="absolute inset-0 bg-[#0A0E14]/75" />
+      </div>
+
+      <div className="mx-auto max-w-md">
+        <h1 className="text-2xl font-bold text-[#E9F0F7]">Masuk</h1>
       <p className="mt-1 text-sm text-[#93A3B5]">
         Gunakan akun yang sama dengan yang dipakai PC Bridge.
       </p>
@@ -81,6 +92,7 @@ export default function Login() {
           </Link>
         </p>
       </Card>
-    </div>
+      </div>
+    </>
   )
 }

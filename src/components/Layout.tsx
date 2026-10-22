@@ -70,11 +70,6 @@ function Header() {
             Timeline
           </NavLink>
           {user ? (
-            <NavLink to="/races" className={navLink}>
-              Balapan
-            </NavLink>
-          ) : null}
-          {user ? (
             <NavLink to="/pb" className={navLink}>
               PB
             </NavLink>

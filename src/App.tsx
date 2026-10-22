@@ -9,7 +9,6 @@ import Login from './pages/Login'
 import NotFound from './pages/NotFound'
 import PersonalBests from './pages/PersonalBests'
 import Profile from './pages/Profile'
-import Races from './pages/Races'
 import RaceDetail from './pages/RaceDetail'
 import Register from './pages/Register'
 import Settings from './pages/Settings'
@@ -39,14 +38,8 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/feed" element={<Feed />} />
-        <Route
-          path="/races"
-          element={
-            <RequireAuth>
-              <Races />
-            </RequireAuth>
-          }
-        />
+        {/* Halaman Balapan dihapus — akses sesi lewat Timeline/Profil. */}
+        <Route path="/races" element={<Navigate to="/feed" replace />} />
         <Route
           path="/races/:id"
           element={

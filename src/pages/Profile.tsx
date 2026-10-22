@@ -186,7 +186,7 @@ export default function Profile() {
           ) : (
             <>
               {riwayat.items.map((race) => (
-                <SessionCard key={race.id} race={race} />
+                <SessionCard key={race.id} race={race} detailTo={`/races/${race.id}`} />
               ))}
 
               {riwayat.hasMore ? (

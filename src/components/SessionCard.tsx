@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import {
   displayNameOf,
@@ -10,6 +10,7 @@ import {
 } from '../lib/format'
 import type { RaceSummary } from '../types'
 import { Avatar, Badge } from './ui'
+import { TrackPath } from './TrackPath'
 
 /**
  * Satu entri di timeline.
@@ -20,18 +21,30 @@ import { Avatar, Badge } from './ui'
 export function SessionCard({
   race,
   owner,
+  detailTo,
 }: {
   race: RaceSummary
   owner?: { id: string; displayName: string | null }
+  /** Rute detail balapan — diisi supaya seluruh kartu bisa diklik. */
+  detailTo?: string
 }) {
+  const navigate = useNavigate()
   const selesai = race.status === 'finished'
   const waktu = race.endedAt ?? race.startedAt
 
   return (
-    <article className="fade-up rounded-2xl border border-[#2A3746] bg-[#141B24] transition-colors hover:border-[#19E3B1]/30">
+    <article
+      onClick={detailTo ? () => navigate(detailTo) : undefined}
+      className={`fade-up rounded-2xl border border-[#2A3746] bg-[#141B24] transition-colors hover:border-[#19E3B1]/30${detailTo ? ' cursor-pointer' : ''}`}
+    >
       <div className="flex items-start gap-4 p-4">
         {owner ? (
-          <Link to={`/u/${owner.id}`} className="shrink-0" aria-label={displayNameOf(owner.displayName)}>
+          <Link
+            to={`/u/${owner.id}`}
+            onClick={(e) => e.stopPropagation()}
+            className="shrink-0"
+            aria-label={displayNameOf(owner.displayName)}
+          >
             <Avatar name={owner.displayName} size={42} />
           </Link>
         ) : null}
@@ -41,6 +54,7 @@ export function SessionCard({
             {owner ? (
               <Link
                 to={`/u/${owner.id}`}
+                onClick={(e) => e.stopPropagation()}
                 className="truncate text-sm font-semibold text-[#E9F0F7] hover:text-[#19E3B1]"
               >
                 {displayNameOf(owner.displayName)}
@@ -55,14 +69,36 @@ export function SessionCard({
           <p className="mt-1 text-xs text-[#5F6F80]">
             {race.sessionType} · {formatRelative(waktu)}
             {race.car ? ` · ${race.car}` : ''}
+            {detailTo ? (
+              <>
+                {' · '}
+                <Link
+                  to={detailTo}
+                  onClick={(e) => e.stopPropagation()}
+                  className="font-semibold text-[#19E3B1] hover:underline"
+                >
+                  Lihat detail →
+                </Link>
+              </>
+            ) : null}
           </p>
 
-          <dl className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <Stat label="Lap" value={String(race.totalLaps)} />
-            <Stat label="Lap terbaik" value={formatLap(race.bestLapMs)} accent />
-            <Stat label="Rata-rata" value={formatLap(race.avgLapMs)} />
-            <Stat label="Top speed" value={`${formatSpeed(race.topSpeedKph)}`} unit="km/h" />
-          </dl>
+          <div className="mt-3 flex items-end gap-4">
+            <dl className="grid min-w-0 flex-1 grid-cols-2 gap-3 sm:grid-cols-4">
+              <Stat label="Lap" value={String(race.totalLaps)} />
+              <Stat label="Lap terbaik" value={formatLap(race.bestLapMs)} accent />
+              <Stat label="Rata-rata" value={formatLap(race.avgLapMs)} />
+              <Stat label="Top speed" value={`${formatSpeed(race.topSpeedKph)}`} unit="km/h" />
+            </dl>
+            {Array.isArray(race.pathPoints) && race.pathPoints.length >= 2 ? (
+              <div className="shrink-0" title="Lintasan yang dilalui">
+                <TrackPath
+                  points={race.pathPoints}
+                  className="block h-20 w-20 sm:h-24 sm:w-24"
+                />
+              </div>
+            ) : null}
+          </div>
         </div>
       </div>
     </article>

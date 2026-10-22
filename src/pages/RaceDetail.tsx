@@ -3,9 +3,13 @@ import { Link, useParams } from 'react-router-dom'
 
 import { LapChart, ConsistencyMeter } from '../components/charts'
 import { PageHeader } from '../components/Layout'
+import { TrackPath } from '../components/TrackPath'
 import { Alert, Badge, Card, SectionTitle, Spinner, StatTile } from '../components/ui'
 import { api } from '../lib/api'
 import {
+  displayNameOf,
+  formatDateTime,
+  formatDistance,
   formatDuration,
   formatLap,
   formatSpeed,
@@ -43,12 +47,17 @@ export default function RaceDetail() {
   const laps = data?.laps ?? []
   const lapBerwaktu = laps.filter((l) => typeof l.lapTimeMs === 'number' && l.lapTimeMs > 0)
   const lapSah = lapBerwaktu.filter((l) => l.valid)
+  const pathPoints = race?.pathPoints ?? null
+  const punyaLintasan = Array.isArray(pathPoints) && pathPoints.length >= 2
 
   return (
     <>
+      <Link to="/feed" className="mb-3 inline-block text-sm text-[#19E3B1] hover:underline">
+        ← Kembali ke daftar balapan
+      </Link>
       <PageHeader
         title={race ? trackLabel(race.track) : 'Detail Balapan'}
-        subtitle={race ? `${gameLabel(race.game)} · ${race.sessionType}` : 'Memuat…'}
+        subtitle={race ? `${gameLabel(race.game)} · ${race.sessionType}${data?.user ? ` · Pembalap: ${displayNameOf(data.user.displayName)}` : ''}` : 'Memuat…'}
       />
 
       {loading ? (
@@ -58,9 +67,6 @@ export default function RaceDetail() {
       ) : error || !race ? (
         <div className="space-y-4">
           <Alert tone="bad">{error ?? 'Balapan tidak ditemukan.'}</Alert>
-          <Link to="/races" className="text-sm text-[#19E3B1] hover:underline">
-            ← Kembali ke daftar balapan
-          </Link>
         </div>
       ) : (
         <>
@@ -80,13 +86,17 @@ export default function RaceDetail() {
             <StatTile label="Lap terbaik" value={formatLap(race.bestLapMs)} accent />
             <StatTile label="Rata-rata" value={formatLap(race.avgLapMs)} />
             <StatTile label="Top speed" value={formatSpeed(race.topSpeedKph)} unit="km/h" />
+            <StatTile
+              label="Total jarak"
+              value={formatDistance(race.totalDistanceM)}
+            />
           </div>
 
           <div className="mt-4 grid grid-cols-2 gap-4 text-xs sm:grid-cols-4">
             <Info label="Status" value={race.status} />
             <Info label="Durasi" value={formatDuration(race.durationMs)} />
-            <Info label="Mulai" value={race.startedAt} />
-            <Info label="Selesai" value={race.endedAt ?? '—'} />
+            <Info label="Mulai" value={formatDateTime(race.startedAt)} />
+            <Info label="Selesai" value={formatDateTime(race.endedAt)} />
           </div>
 
           {/* --- grafik lap --- */}
@@ -102,6 +112,19 @@ export default function RaceDetail() {
               <ConsistencyMeter valid={lapSah.length} total={lapBerwaktu.length} />
             </div>
           </Card>
+
+          {/* --- lintasan yang dilalui (migrasi 005) --- */}
+          {punyaLintasan ? (
+            <Card className="mt-6 p-6">
+              <SectionTitle
+                title="Lintasan yang dilalui"
+                subtitle={`Direkonstruksi dari koordinat dunia game (${pathPoints.length} titik). Titik besar = posisi awal mobil.`}
+              />
+              <div className="mt-4">
+                <TrackPath points={pathPoints} />
+              </div>
+            </Card>
+          ) : null}
 
           {/* --- tabel lap --- */}
           <Card className="mt-6 p-6">
@@ -153,10 +176,6 @@ export default function RaceDetail() {
               </div>
             )}
           </Card>
-
-          <Link to="/races" className="mt-6 inline-block text-sm text-[#19E3B1] hover:underline">
-            ← Kembali ke daftar balapan
-          </Link>
         </>
       )}
     </>

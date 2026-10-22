@@ -45,7 +45,7 @@ export default function Feed() {
       ) : (
         <div className="space-y-3">
           {items.map((item) => (
-            <SessionCard key={item.id} race={item} owner={item.user} />
+            <SessionCard key={item.id} race={item} owner={item.user} detailTo={`/races/${item.id}`} />
           ))}
 
           {hasMore ? (

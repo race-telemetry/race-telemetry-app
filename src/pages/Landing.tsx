@@ -154,7 +154,12 @@ export default function Landing() {
             />
           ) : (
             terbaru.map((item) => (
-              <SessionCard key={item.id} race={item} owner={item.user} />
+              <SessionCard
+                key={item.id}
+                race={item}
+                owner={item.user}
+                detailTo={`/races/${item.id}`}
+              />
             ))
           )}
         </div>

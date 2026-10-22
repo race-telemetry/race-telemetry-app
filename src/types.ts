@@ -50,6 +50,10 @@ export type RaceSummary = {
   bestLapNumber: number | null
   avgLapMs: number | null
   topSpeedKph: number | null
+  /** Jarak tempuh total sesi (meter) — dari session.result (migrasi 005). */
+  totalDistanceM: number | null
+  /** Bentuk lintasan [x, z] dari session.result (migrasi 005). */
+  pathPoints: [number, number][] | null
 }
 
 /** Item timeline: sesi + pemiliknya. */
@@ -82,7 +86,15 @@ export type Lap = {
   invalidReasons: string[] | null
 }
 
-export type RaceDetail = { race: RaceSummary; laps: Lap[] }
+export type RaceDetail = {
+  race: RaceSummary & {
+    /** Jalur lintasan [[x, z], ...] — hanya ada di detail, bukan di daftar. */
+    pathPoints: [number, number][] | null
+  }
+  /** Pembalap pemilik sesi (untuk ditampilkan di halaman detail). */
+  user: { id: string; displayName: string | null } | null
+  laps: Lap[]
+}
 
 /** Personal best per sirkuit & mobil (milik user sendiri). */
 export type PersonalBest = {

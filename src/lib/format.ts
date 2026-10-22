@@ -26,6 +26,13 @@ export function formatSpeed(kph: number | null | undefined): string {
   return String(Math.round(kph))
 }
 
+/** 843 -> "843 m", 12450 -> "12,4 km" (jarak tempuh sesi, migrasi 005). */
+export function formatDistance(m: number | null | undefined): string {
+  if (m === null || m === undefined || !Number.isFinite(m)) return '—'
+  if (m < 1000) return `${Math.round(m)} m`
+  return `${new Intl.NumberFormat('id-ID', { maximumFractionDigits: 1 }).format(m / 1000)} km`
+}
+
 export function formatNumber(value: number | null | undefined): string {
   if (value === null || value === undefined) return '—'
   return new Intl.NumberFormat('id-ID').format(value)
@@ -37,6 +44,22 @@ export function formatDate(iso: string | null | undefined): string {
   const date = new Date(iso)
   if (Number.isNaN(date.getTime())) return '—'
   return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
+/** Tanggal + jam: "22 Okt 2026, 18.44.55" (waktu lokal browser). */
+export function formatDateTime(iso: string | null | undefined): string {
+  if (!iso) return '—'
+  const date = new Date(iso)
+  if (Number.isNaN(date.getTime())) return '—'
+  return date.toLocaleString('id-ID', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  })
 }
 
 /** "3 jam lalu", "2 hari lalu" */
