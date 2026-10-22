@@ -69,6 +69,32 @@ export type Paginated<T> = {
   pagination: Pagination
 }
 
+/** Satu lap di dalam detail balapan (`GET /api/races/:id`). */
+export type Lap = {
+  lapNumber: number
+  lapTimeMs: number | null
+  sector1Ms: number | null
+  sector2Ms: number | null
+  sector3Ms: number | null
+  valid: boolean
+  isBest: boolean
+  topSpeedKph: number | null
+  invalidReasons: string[] | null
+}
+
+export type RaceDetail = { race: RaceSummary; laps: Lap[] }
+
+/** Personal best per sirkuit & mobil (milik user sendiri). */
+export type PersonalBest = {
+  game: string
+  track: string
+  car: string | null
+  bestLapMs: number
+  sessionId: string
+  lapNumber: number
+  achievedAt: string
+}
+
 /** Satu PC (device) yang terdaftar memakai token kita. */
 export type Device = {
   id: string

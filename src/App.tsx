@@ -7,7 +7,10 @@ import Feed from './pages/Feed'
 import Landing from './pages/Landing'
 import Login from './pages/Login'
 import NotFound from './pages/NotFound'
+import PersonalBests from './pages/PersonalBests'
 import Profile from './pages/Profile'
+import Races from './pages/Races'
+import RaceDetail from './pages/RaceDetail'
 import Register from './pages/Register'
 import Settings from './pages/Settings'
 import { useAuth } from './state/auth'
@@ -36,6 +39,30 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/feed" element={<Feed />} />
+        <Route
+          path="/races"
+          element={
+            <RequireAuth>
+              <Races />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/races/:id"
+          element={
+            <RequireAuth>
+              <RaceDetail />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/pb"
+          element={
+            <RequireAuth>
+              <PersonalBests />
+            </RequireAuth>
+          }
+        />
         {/* Timeline & profil publik: bisa dibuka siapa saja yang punya link. */}
         <Route path="/u/:id" element={<Profile />} />
         <Route path="/login" element={<Login />} />

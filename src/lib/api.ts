@@ -4,7 +4,17 @@
  * Semua permintaan lewat origin yang sama (Vite mem-proxy `/api`), jadi tidak
  * perlu CORS. `VITE_API_BASE` hanya diisi bila API ada di domain lain.
  */
-import type { Device, DeviceSetup, FeedItem, Me, Paginated, PublicUser, RaceSummary } from '../types'
+import type {
+  Device,
+  DeviceSetup,
+  FeedItem,
+  Me,
+  Paginated,
+  PersonalBest,
+  PublicUser,
+  RaceDetail,
+  RaceSummary,
+} from '../types'
 
 const BASE = (import.meta.env.VITE_API_BASE ?? '').replace(/\/+$/, '')
 
@@ -115,13 +125,26 @@ export const api = {
   },
 
   // --- data milik sendiri ------------------------------------------------
-  myRaces: (token: string, opts: { limit?: number; offset?: number } = {}) => {
+  myRaces: (
+    token: string,
+    opts: { limit?: number; offset?: number; game?: string; includeLive?: boolean } = {},
+  ) => {
     const params = new URLSearchParams()
     if (opts.limit) params.set('limit', String(opts.limit))
     if (opts.offset) params.set('offset', String(opts.offset))
+    if (opts.game) params.set('game', opts.game)
+    if (opts.includeLive) params.set('includeLive', 'true')
     const query = params.toString()
     return request<Paginated<RaceSummary>>(`/api/races${query ? `?${query}` : ''}`, { token })
   },
+
+  /** Detail satu balapan: ringkasan + daftar lap. */
+  raceDetail: (token: string, id: string, signal?: AbortSignal) =>
+    request<RaceDetail>(`/api/races/${encodeURIComponent(id)}`, { token, signal }),
+
+  /** Personal best milik sendiri (per sirkuit & mobil). */
+  personalBests: (token: string, signal?: AbortSignal) =>
+    request<{ data: PersonalBest[] }>('/api/personal-bests', { token, signal }),
 
   // --- PC Bridge: alamat server & token device --------------------------
   /** Alamat server (WSS) yang harus diisi di PC Bridge + awalan token. */
